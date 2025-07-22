@@ -1,2 +1,2 @@
-development = true -- won't autoupdate to the github repo
-autoupdateTarget = "https://raw.githubusercontent.com/ScaryWizard69/CC-Tweaked-OS/main/"
+development = false -- won't autoupdate to the github repo
+autoupdateTarget = "https://raw.githubusercontent.com/Janjre/CC-Tweaked-OS/main/"

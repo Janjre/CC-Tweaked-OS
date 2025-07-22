@@ -1,4 +1,4 @@
-require("OS/config.lua")
+require("config")
 base = autoupdateTarget or "https://raw.githubusercontent.com/ScaryWizard69/CC-Tweaked-OS/main/"
 
 local files = {
@@ -11,29 +11,35 @@ local files = {
   { url = "OS/programs/chat.lua", dest = "OS/programs/chat.lua"},
   { url = "OS/programs/sendfile.lua", dest = "OS/programs/sendfile.lua"},
   { url = "OS/programs/recvfile.lua", dest = "OS/programs/recvfile.lua"},
-  { url = "OS/programs/update.lua", dest = "OS/programs/update.lua"},
-  { url = "OS/programs/version.txt", dest = "OS/programs/version.txt"},
-  { url = "OS/programs/config.llua", dest = "OS/programs/config.lua"}
+  { url = "OS/update.lua", dest = "OS/update.lua"},
+  { url = "OS/version.txt", dest = "OS/version.txt"},
+--   { url = "OS/programs/config.llua", dest = "OS/programs/config.lua"}
 }
 
 for _, file in ipairs(files) do
     local fullUrl = base .. file.url
-    local ok, err = http.get(fullUrl)
-    if ok then
-        local toWrite = ok.readAll()
-        local readHandle = fs.open(file.dest, "r")
-        if readHandle.readAll() == toWrite then
-            ok.close()
-        else
-            writeHandle = fs.open(file.dest, "w+") -- Use "w+" to overwrite the file
-            writeHandle.write(toWrite)
-            writeHandle.close()
+    local response = http.get(fullUrl)
+    if response then
+        local newData = response.readAll()
+        response.close()
 
+        local needsUpdate = true
+        if fs.exists(file.dest) then
+            local readHandle = fs.open(file.dest, "r")
+            local oldData = readHandle.readAll()
+            readHandle.close()
+
+            if oldData == newData then
+                needsUpdate = false
+            end
+        end
+
+        if needsUpdate then
+            local writeHandle = fs.open(file.dest, "w")
+            writeHandle.write(newData)
+            writeHandle.close()
             print("Updated file: " .. file.dest)
         end
-        readHandle.close()
-
-        ok.close()
     else
         print("Failed to update: " .. file.url)
     end
